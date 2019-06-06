@@ -3,7 +3,9 @@ import discord
 import random
 from os import environ
 from datetime import *
+from time import sleep
 TOKEN = environ.get("DISCORD_TOKEN")
+client = discord.Client()
 MESSAGES = [
     "Punching mom in the bladder.",
     "Sleeping.",
@@ -46,8 +48,7 @@ class ShoppingList:
             return self.add(new_message)
 
         if "!shop list" in message:
-            new_message = message.replace("!shop list", "")
-            return self.list(new_message)
+            return self.list()
 
         if "!shop clear" in message:
             return self.clear()
@@ -56,7 +57,7 @@ class ShoppingList:
         self.shopping_list.append(message)
         return f"added {message}!"
 
-    def list(self, message):
+    def list(self):
         our_list = "Shopping list:\n"
         for item in self.shopping_list:
             our_list += item + "\n"
@@ -67,8 +68,6 @@ class ShoppingList:
         self.shopping_list = []
         return "Cleared!"
 
-
-client = discord.Client()
 
 @client.event
 async def on_message(message):
@@ -99,4 +98,9 @@ async def on_ready():
 
 shopping_list = ShoppingList()
 
-client.run(TOKEN)
+while True:
+    try:
+        client.loop.run_until_complete(client.start(TOKEN))
+    except Exception as e:
+        print(e)
+    sleep(3)
