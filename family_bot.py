@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import discord
 import random
-from os import environ
+from os import environ, path
 from datetime import *
 from time import sleep
 TOKEN = environ.get("DISCORD_TOKEN")
@@ -37,10 +37,12 @@ MESSAGES = [
     "Swimmin' laps"
 ]
 
+LIST_FILE = "shop_list.txt"
+
 
 class ShoppingList:
     def __init__(self):
-        self.shopping_list = []
+        open(LIST_FILE, 'a+').close()
 
     def handle(self, message):
         if "!shop add" in message:
@@ -53,19 +55,25 @@ class ShoppingList:
         if "!shop clear" in message:
             return self.clear()
 
-    def add(self, message):
-        self.shopping_list.append(message)
+    @staticmethod
+    def add(message):
+        with open(LIST_FILE, "w") as shop_list:
+            shop_list.write(message + "\n")
         return f"added {message}!"
 
-    def list(self):
+    @staticmethod
+    def list():
         our_list = "Shopping list:\n"
-        for item in self.shopping_list:
-            our_list += item + "\n"
+        with open(LIST_FILE, "r") as shop_list:
+            for item in shop_list.readline():
+                our_list += item
 
         return our_list
 
-    def clear(self):
-        self.shopping_list = []
+    @staticmethod
+    def clear():
+        with open(LIST_FILE, "w") as shop_list:
+            shop_list.truncate(0)
         return "Cleared!"
 
 
