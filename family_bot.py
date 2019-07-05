@@ -57,7 +57,7 @@ class ShoppingList:
 
     @staticmethod
     def add(message):
-        with open(LIST_FILE, "w") as shop_list:
+        with open(LIST_FILE, "a") as shop_list:
             shop_list.write(message + "\n")
         return f"added {message}!"
 
