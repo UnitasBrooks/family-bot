@@ -37,7 +37,7 @@ MESSAGES = [
     "Swimmin' laps"
 ]
 
-LIST_FILE = "shop_list.txt"
+LIST_FILE = environ.get("LIST_FILE", "shop_list.txt")
 
 
 class ShoppingList:
