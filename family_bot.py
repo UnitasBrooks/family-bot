@@ -65,7 +65,7 @@ class ShoppingList:
     def list():
         our_list = "Shopping list:\n"
         with open(LIST_FILE, "r") as shop_list:
-            for item in shop_list.readline():
+            for item in shop_list.readlines():
                 our_list += item
 
         return our_list
