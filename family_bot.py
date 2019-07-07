@@ -55,6 +55,10 @@ class ShoppingList:
         if "!shop clear" in message:
             return self.clear()
 
+        if "!shop remove" in message:
+            message = message.replace("!shop remove ", "")
+            self.remove(message)
+
     @staticmethod
     def add(message):
         with open(LIST_FILE, "a") as shop_list:
@@ -69,6 +73,16 @@ class ShoppingList:
                 our_list += item
 
         return our_list
+
+    @staticmethod
+    def remove(message):
+        with open(LIST_FILE, "r+") as shop_list:
+            lines = shop_list.readlines()
+            shop_list.seek(0)
+            for line in lines:
+                if line != f"{message}\n":
+                    shop_list.write(line)
+            shop_list.truncate()
 
     @staticmethod
     def clear():
