@@ -90,7 +90,7 @@ class ShoppingList:
         if found is True:
             return f"Removed f{message} from the list!"
         else:
-            return f"Could not find f{message} in the list"
+            return f"Could not find {message} in the list"
 
 
 
