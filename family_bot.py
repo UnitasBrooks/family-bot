@@ -46,7 +46,7 @@ class ShoppingList:
 
     def handle(self, message):
         if "!shop add" in message:
-            new_message = message.replace("!shop add", "")
+            new_message = message.replace("!shop add ", "")
             return self.add(new_message)
 
         if "!shop list" in message:
