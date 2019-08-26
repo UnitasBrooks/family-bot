@@ -134,5 +134,6 @@ while True:
     try:
         client.loop.run_until_complete(client.start(TOKEN))
     except Exception as e:
+        client.close()
         print(e)
     sleep(3)
