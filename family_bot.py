@@ -81,7 +81,7 @@ class ShoppingList:
             lines = shop_list.readlines()
             shop_list.seek(0)
             for line in lines:
-                if line != f"{message}\n":
+                if line != "{message}\n":
                     shop_list.write(line)
                 else:
                     found = True
