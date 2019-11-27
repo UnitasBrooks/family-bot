@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import discord
 import random
-from os import environ, path
+from os import environ
 from datetime import *
 from time import sleep
 TOKEN = environ.get("DISCORD_TOKEN")
@@ -38,11 +38,13 @@ MESSAGES = [
 ]
 
 LIST_FILE = environ.get("LIST_FILE", "shop_list.txt")
+RECIPES_FILE = environ.get("RECIPES_FILE", "recipes.txt")
 
 
 class ShoppingList:
     def __init__(self):
         open(LIST_FILE, 'a+').close()
+        open(RECIPES_FILE, 'a+').close()
 
     def handle(self, message):
         if "!shop add" in message:
@@ -59,19 +61,79 @@ class ShoppingList:
             message = message.replace("!shop remove ", "")
             return self.remove(message)
 
+        if "!recipe add" in message:
+            message = message.replace("!recipe add ", "")
+            message = "++ " + message.replace('\n', ' ++', 1)
+            return self.add(message, RECIPES_FILE)
+
+        if "!recipe list" in message:
+            return self.recipe_list()
+
+        if "!recipe remove" in message:
+            message = message.replace("!recipe remove ", "")
+            self.recipe_remove(message)
+
+        if "!recipe get" in message:
+            message = message.replace("!recipe get ", "")
+            self.recipe_get(message)
+
     @staticmethod
-    def add(message):
-        with open(LIST_FILE, "a") as shop_list:
+    def add(message, file_handler=LIST_FILE):
+        with open(file_handler, "a") as shop_list:
             shop_list.write(message + "\n")
         return f"added {message}!"
 
+    @staticmethod
+    def recipe_list():
+        items = "Recipes:\n"
+        with open(RECIPES_FILE, "r") as recipe_list:
+            for item in recipe_list.readlines():
+                if "++" in item:
+                    items += item
+        return items
+
+    @staticmethod
+    def recipe_get(recipe_name):
+        items = "Recipes:\n"
+        seeking = False
+        with open(RECIPES_FILE, "r") as recipe_list:
+            for item in recipe_list.readlines():
+                if seeking is True and "++" in item:
+                    break
+                if seeking is True:
+                    items += item
+                if "++" in item and recipe_name in item:
+                    seeking = True
+        return items
+
+    @staticmethod
+    def recipe_remove(recipe_name):
+        seeking = False
+        with open(RECIPES_FILE, "r+") as recipe_list:
+            lines = recipe_list.readlines()
+            recipe_list.seek(0)
+            for line in lines:
+                if seeking is True and "++" in line:
+                    break
+                if seeking is True:
+                    continue
+                if "++" in line and recipe_name in line:
+                    seeking = True
+                    continue
+                recipe_list.write(line)
+            recipe_list.truncate()
+
+        if seeking is True:
+            return f"Removed {recipe_name} from the list!"
+        else:
+            return f"Could not find {recipe_name} in the list"
+        
     @staticmethod
     def list():
         our_list = "Shopping list:\n"
         with open(LIST_FILE, "r") as shop_list:
             for item in shop_list.readlines():
                 our_list += item
-
         return our_list
 
     @staticmethod
@@ -91,8 +153,6 @@ class ShoppingList:
             return f"Removed f{message} from the list!"
         else:
             return f"Could not find {message} in the list"
-
-
 
     @staticmethod
     def clear():
@@ -117,7 +177,7 @@ async def on_message(message):
         msg = str((future - today).days)
         await client.send_message(message.channel, msg)
 
-    if message.content.startswith("!shop"):
+    if message.content.startswith("!shop") or message.content.startswith("!recipe"):
         await client.send_message(message.channel, shopping_list.handle(message.content))
 
 
